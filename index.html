@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pension Calculator</title>
+    <style>
+    
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('jema.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height:100%;
+        }
+        
+        .calculator-container {
+            background-color: #fff;
+            padding-left: 30px;
+            padding: 100px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 100%;
+            width: 80%;
+            align-items: left;
+        }
+        
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #007ACC;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+        }
+        
+        input:focus {
+            border-color: #007ACC;
+        }
+        
+        button {
+            width: 30%;
+            padding: 15px;
+            font-size: 18px;
+            color: #fff;
+            background-color: #007ACC;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+            align-items: right;
+        }
+        
+        button:hover {
+            background-color: #005f99;
+        }
+        
+        .table-container {
+            margin-top: 30px;
+            border-radius: 20%;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        table th, table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #007ACC;
+            color: white;
+        }
+        
+        tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        #downloadBtn {
+            margin-top: 20px;
+            background-color: #28a745;
+        }
+        
+        #downloadBtn:hover {
+            background-color: #218838;
+        }
+        
+
+    </style>
+
+
+</head>
+<body>
+    <div class="calculator-container">
+        <h1>Lumpsum & Monthly Pension Calculator</h1>
+        
+        <form id="pensionForm">
+            <div class="input-group">
+                <label for="dob">Date of Birth:</label>
+                <input type="date" id="dob" name="dob" required>
+            </div>
+
+            <div class="input-group">
+                <label for="joinDate">Date of Joining the Fund:</label>
+                <input type="date" id="joinDate" name="joinDate" required>
+            </div>
+
+            <div class="input-group">
+                <label for="exitDate">Date of Exiting the Fund:</label>
+                <input type="date" id="exitDate" name="exitDate" required>
+            </div>
+
+            <div class="input-group">
+                <label for="salary">APE Salary (TZS):</label>
+                <input type="number" id="salary" name="salary" required>
+            </div>
+
+            <div class="input-group">
+                <label for="servicePeriod">Service Period (Months):</label>
+                <input type="number" id="servicePeriod" name="servicePeriod" required>
+            </div>
+
+            <div class="input-group">
+                <label for="lifeExpectancy">Life Expectancy (Years):</label>
+                <input type="number" id="lifeExpectancy" name="lifeExpectancy" required>
+            </div>
+
+            <button type="button" id="calculateBtn">Calculate Pension</button>
+        </form>
+
+
+
+  <!--after calculate the result will dynamically list hear-->
+        <div class="table-container">
+            <h2>Results Table</h2>
+            <table id="resultsTable">
+                <thead>
+                    <tr>
+                        <th>Date of Birth</th>
+                        <th>Joining Date</th>
+                        <th>Exiting Date</th>
+                        <th>Lumpsum (TZS)</th>
+                        <th>Monthly Pension (TZS)</th>
+                        <th>Annual Pension (TZS)</th>
+                        <th>Total Pension (TZS)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <button id="downloadBtn">Download </button>
+    </div>
+
+    <script >
+
+        document.getElementById('calculateBtn').addEventListener('click', function() {
+            // Get input values
+            const dob = new Date(document.getElementById('dob').value);
+            const joinDate = new Date(document.getElementById('joinDate').value);
+            const exitDate = new Date(document.getElementById('exitDate').value);
+            const salary = parseFloat(document.getElementById('salary').value);
+            const servicePeriod = parseFloat(document.getElementById('servicePeriod').value);
+            const lifeExpectancy = parseFloat(document.getElementById('lifeExpectancy').value);
+        
+            // Calculate Age at Retirement
+            const retirementAge = (exitDate - dob) / (1000 * 60 * 60 * 24 * 365.25);
+        
+            // Calculate Lumpsum
+            const lumpsum = salary * (servicePeriod / 12) * 0.33;
+        
+            // Calculate Monthly Pension
+            const monthlyPension = (salary * (servicePeriod / 12)) / (lifeExpectancy * 12);
+        
+            // Calculate Annual Pension
+            const annualPension = monthlyPension * 12;
+        
+            // Calculate Total Pension Over Expected Years
+            const totalPension = monthlyPension * (lifeExpectancy * 12);
+        
+            // Add results to table
+            const resultsTable = document.querySelector('#resultsTable tbody');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${dob.toLocaleDateString()}</td>
+                <td>${joinDate.toLocaleDateString()}</td>
+                <td>${exitDate.toLocaleDateString()}</td>
+                <td>${lumpsum.toFixed(2)}</td>
+                <td>${monthlyPension.toFixed(2)}</td>
+                <td>${annualPension.toFixed(2)}</td>
+                <td>${totalPension.toFixed(2)}</td>
+            `;
+            resultsTable.appendChild(newRow);
+        });
+        
+        // Download results as CSV exlcel sheet
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            const table = document.getElementById('resultsTable');
+            const rows = Array.from(table.querySelectorAll('tr'));
+            const csv = [];
+            
+            rows.forEach(row => {
+                const columns = Array.from(row.querySelectorAll('th, td')).map(column => column.textContent);
+                csv.push(columns.join(','));
+            });
+        
+            const csvString = csv.join('\n');
+            const blob = new Blob([csvString], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'pension_file.csv';
+            link.click();
+        });
+        
+
+
+
+
+
+
+
+
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
